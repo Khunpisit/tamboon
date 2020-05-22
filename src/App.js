@@ -5,7 +5,6 @@ import fetch from 'isomorphic-fetch';
 
 import { summaryDonations } from './helpers';
 
-
 const Card = styled.div`
   margin: 10px;
   border: 1px solid #ccc;
@@ -86,9 +85,11 @@ export default connect((state) => state)(
 
 function handlePay(id, amount, currency) {
   const self = this;
+
   return function() {
     fetch('http://localhost:3001/payments', {
       method: 'POST',
+      headers: {'Content-Type': 'application/json'},
       body: `{ "charitiesId": ${id}, "amount": ${amount}, "currency": "${currency}" }`,
     })
       .then(function(resp) { return resp.json(); })
