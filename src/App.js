@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import fetch from 'isomorphic-fetch';
 
-import { summaryDonations } from './helpers';
+import { summaryDonations, handlePay } from './helpers';
 
 const Card = styled.div`
   margin: 10px;
@@ -56,7 +56,7 @@ export default connect((state) => state)(
           <Card key={i}>
             <p>{item.name}</p>
             {payments}
-            <button onClick={handlePay.call(self, item.id, self.state.selectedAmount, item.currency)}>Pay</button>
+            <button onClick={handlePay(self, item.id, self.state.selectedAmount, item.currency)}>Pay</button>
           </Card>
         );
       });
@@ -82,33 +82,3 @@ export default connect((state) => state)(
     }
   }
 );
-
-function handlePay(id, amount, currency) {
-  const self = this;
-
-  return function() {
-    fetch('http://localhost:3001/payments', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: `{ "charitiesId": ${id}, "amount": ${amount}, "currency": "${currency}" }`,
-    })
-      .then(function(resp) { return resp.json(); })
-      .then(function() {
-        self.props.dispatch({
-          type: 'UPDATE_TOTAL_DONATE',
-          amount,
-        });
-        self.props.dispatch({
-          type: 'UPDATE_MESSAGE',
-          message: `Thanks for donate ${amount}!`,
-        });
-
-        setTimeout(function() {
-          self.props.dispatch({
-            type: 'UPDATE_MESSAGE',
-            message: '',
-          });
-        }, 2000);
-      });
-  }
-}
